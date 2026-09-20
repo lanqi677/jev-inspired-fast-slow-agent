@@ -1,0 +1,41 @@
+{
+ "task": "只把「经办人」改成 李娜 并保存，不要提交",
+ "ok": true,
+ "escalated": false,
+ "blocked": false,
+ "trace": [
+  {
+   "step": 1,
+   "status": "处理中",
+   "nCand": 11,
+   "best": "J1",
+   "conf": 0.95,
+   "done": "no",
+   "doneConf": 0.98,
+   "ms": 314,
+   "ptok": 887,
+   "hit": 256,
+   "ctok": 142,
+   "cost": 0.000180618,
+   "picked": "select:select-one 经办人"
+  },
+  {
+   "step": 2,
+   "status": "处理中",
+   "nCand": 11,
+   "best": "J10",
+   "conf": 0.75,
+   "done": "no",
+   "doneConf": 0.95,
+   "ms": 110,
+   "ptok": 887,
+   "hit": 384,
+   "ctok": 142,
+   "cost": 0.000161802,
+   "picked": "button:submit 保存"
+  }
+ ],
+ "final": [
+  "处理中"
+ ]
+}

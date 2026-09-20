@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jev 决策控制台 · DeepSeek-V4.1-Flash</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#ffffff; --layer:#f0f1f4; --line:#e2e4e9; --line2:#cdd1d9;
+    --fg:#1b1e23; --fg2:#61676f; --brand:#2f6df6; --ok:#12a150; --warn:#c47f00; --err:#d92d20;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#15171b; --card:#1c1f24; --layer:#23272e; --line:#2e333b; --line2:#3d434d;
+           --fg:#e8eaee; --fg2:#9aa1ab; --brand:#5b8cff; --ok:#35c46b; --warn:#e0a83a; --err:#f0655a; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+       font:13px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+  .app{max-width:1400px;margin:0 auto;padding:16px 18px 60px}
+  h1{font-size:16px;margin:0}
+  .sub{color:var(--fg2);font-size:11.5px;font-family:var(--mono)}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .between{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+  .lab{font-weight:600;font-size:11.5px;color:var(--fg2);letter-spacing:.02em}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:11px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start;margin-top:12px}
+  @media (max-width:900px){ .grid{grid-template-columns:1fr} }
+  textarea,input,select{font-family:var(--mono);font-size:11.5px;background:var(--bg);color:var(--fg);
+       border:1px solid var(--line2);border-radius:7px;padding:7px 8px;width:100%;outline:none;line-height:1.5}
+  textarea{resize:vertical;display:block}
+  textarea:focus,input:focus{border-color:var(--brand)}
+  button{font:inherit;cursor:pointer;border-radius:7px;border:1px solid var(--line2);
+       background:transparent;color:var(--fg2);padding:5px 10px;font-size:11.5px}
+  button:hover{color:var(--fg);border-color:var(--fg2)}
+  button.primary{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:600;
+       padding:10px 18px;font-size:13px}
+  button.primary:disabled{opacity:.45;cursor:default}
+  .chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+  .chip{background:var(--layer);color:var(--fg2);border-radius:999px;padding:2px 8px;
+        font-size:11px;font-weight:600;white-space:nowrap}
+  .chip.ok{color:var(--ok)} .chip.bad{color:var(--err)} .chip.warn{color:var(--warn)}
+  .chip b{color:var(--fg);font-weight:700}
+  .line{display:grid;grid-template-columns:minmax(60px,130px) 1fr 56px;gap:8px;align-items:center;margin:3px 0}
+  .bar{height:15px;border-radius:4px;background:var(--layer);overflow:hidden}
+  .bar>i{display:block;height:100%;background:var(--brand);opacity:.5}
+  .bar.win>i{background:var(--ok);opacity:1}
+  .ell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .mono{font-family:var(--mono);font-size:11px}
+  .muted{color:var(--fg2)}
+  pre{margin:6px 0 0;background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:8px;
+      font-family:var(--mono);font-size:10.5px;line-height:1.45;white-space:pre-wrap;
+      word-break:break-all;max-height:240px;overflow:auto}
+  table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px}
+  th,td{text-align:right;padding:4px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+  th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
+  th{color:var(--fg2);font-weight:600;position:sticky;top:0;background:var(--card)}
+  .err{color:var(--err);font-size:12px;word-break:break-all}
+  details summary{cursor:pointer;color:var(--fg2);font-family:var(--mono);font-size:11px}
+  .hr{height:1px;background:var(--line);margin:9px 0}
+  .hint{font-size:11px;color:var(--fg2)}
+  kbd{font-family:var(--mono);font-size:10.5px;background:var(--layer);border:1px solid var(--line2);
+      border-radius:4px;padding:1px 5px}
+  .scroll{max-height:420px;overflow:auto}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="between">
+    <div>
+      <h1>Jev 决策控制台</h1>
+      <div class="sub">deepseek-flash = DeepSeek-V4.1-Flash · thinking=disabled · temp=0 · json_object · 概率按总分归一化</div>
+    </div>
+    <div class="row" style="flex:1;min-width:340px;justify-content:flex-end">
+      <span class="lab">API KEY</span>
+      <input id="key" type="password" placeholder="sk-..." style="max-width:300px" autocomplete="off">
+      <button id="keyToggle">显示</button>
+      <button id="keySave">记住</button>
+      <span id="keyState" class="mono muted">未填</span>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <div class="between">
+      <span class="lab">① 系统提示词（Jev 样式，可改）</span>
+      <div class="row">
+        <span id="sysLen" class="mono muted"></span>
+        <button id="sysToggle">展开</button>
+        <button id="sysReset">还原</button>
+      </div>
+    </div>
+    <div id="sysWrap" style="display:none;margin-top:7px">
+      <textarea id="sys" rows="16" spellcheck="false"></textarea>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="lab" style="margin-bottom:5px">② 提示词（情景 + 问题）</div>
+      <textarea id="prompt" rows="20" spellcheck="false"></textarea>
+
+      <div class="between" style="margin:10px 0 5px">
+        <span class="lab">③ 选项（每行一个标签，空格 / 逗号 / 斜杠都行）</span>
+        <span id="optCount" class="mono muted"></span>
+      </div>
+      <textarea id="opts" rows="6" spellcheck="false"></textarea>
+
+      <div class="row" style="margin-top:10px">
+        <span class="lab">预设用例</span>
+        <button class="preset" data-i="0">A 5选项·明确</button>
+        <button class="preset" data-i="1">B 20选项·干扰</button>
+        <button class="preset" data-i="2">C noul·目标达成</button>
+        <button class="preset" data-i="3">E 双题隔离</button>
+        <button class="preset" data-i="4">F 证据冲突·校准</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="between" style="margin-bottom:9px">
+        <div class="row">
+          <button id="send" class="primary">▶ 发送决策请求</button>
+          <button id="sendAll">⟳ 跑全部预设各 1 次</button>
+        </div>
+        <div class="row">
+          <span class="lab">重复</span>
+          <input id="repeat" type="number" value="1" min="1" max="5" style="width:56px">
+          <label class="hint row" style="gap:4px"><input id="stream" type="checkbox" style="width:auto"> 流式测 TTFT</label>
+        </div>
+      </div>
+      <div id="result" class="muted">填好左边（右上角先填 API KEY），点「发送决策请求」。</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <div class="between" style="margin-bottom:8px">
+      <span class="lab">本次会话记录</span>
+      <div class="row">
+        <span id="totals" class="mono muted"></span>
+        <button id="clearLog">清空</button>
+      </div>
+    </div>
+    <div class="scroll">
+      <table>
+        <thead><tr>
+          <th>#</th><th>用例</th><th>best</th><th>conf</th><th>选项</th>
+          <th>延迟</th><th>TTFT</th><th>in</th><th>out</th><th>hit</th><th>miss</th><th>花费</th><th>Jev 同token</th>
+        </tr></thead>
+        <tbody id="log"><tr><td colspan="13" class="muted" style="text-align:center">还没有记录</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ============================== 常量 ============================== */
+const API_URL = 'https://api.deepseek.com/v1/chat/completions';
+const PRICE = { miss: 0.15, hit: 0.003, out: 0.60, jevIn: 0.042 }; // USD / 1M tokens (off-peak)
+
+const DEFAULT_SYSTEM = [
+'你是 System One —— 一个只做决策、不产出文本的判断模型。',
+'',
+'输入: 一段【情景】, 以及一道或多道【问题】, 每题带【选项】。',
+'输出: 一个严格 JSON 对象, 内含每题所有选项的分数。',
+'',
+'决策原语(只有这三种):',
+'- choice: 从 N 个互斥选项里选一个 -> 给每个选项一个相对分数',
+'- noul:   是/否判断 -> 给 {"yes": 分数}',
+'- score:  给单个候选打相关度分 -> 给 {"score": 分数}',
+'',
+'铁律:',
+'1. 只输出 JSON。不解释、不客套、不加代码围栏、不写"答案是"。任何解释性文字都算失败。',
+'2. 分数必须覆盖【全部】选项, 键名与选项标签逐字一致; 不得遗漏、不得新增、不得合并。',
+'3. 分数只是相对权重, 不必凑成 1.0 —— 调用方会自行归一化。给 0~1 之间的小数即可。',
+'4. 置信度必须诚实校准: 证据弱就把分数摊开(例如 0.35 / 0.35 / 0.30), 不要一律给 0.99。',
+'   下游按阈值分流 —— 高置信自动执行, 低置信升级给人。虚高的置信度比答错更糟。',
+'5. 情景是唯一事实来源。情景没写的不要脑补、不要引用常识补全。',
+'6. 同一请求里的多道题彼此独立作答, 互不参照、互不影响、互不泄漏。',
+'',
+'输出格式:',
+'{"answers":[{"id":"<题号>","type":"choice|noul|score","probs":{"<标签>":<数字>,...},"best":"<标签>","conf":<数字>}]}',
+].join('\n');
+
+/* ------------------------------ 预设用例 ------------------------------ */
+const ELS20 = [
+'E1  button "返回列表"','E2  textbox "订单号" value="88213"','E3  button "导出 Excel"',
+'E4  link "帮助中心"','E5  div "订单状态: 已提交"','E6  button "打印"','E7  link "用户协议"',
+'E8  img "logo.png"','E9  button "提交" enabled=true','E10 div "错误: Uncaught TypeError: Cannot read property id of undefined" (红色, 页面顶部)',
+'E11 button "刷新"','E12 select "每页条数" value="20"','E13 link "返回首页"','E14 button "修改地址"',
+'E15 textbox "备注"','E16 div "共 1 条记录"','E17 button "下载模板"','E18 link "隐私政策"',
+'E19 button "客服"','E20 checkbox "全选"'];
+
+const P_A = `【情景】
+应用: 工单系统 工作项详情页
+目标: 把该工作项的"经办人"从 张伟 改成 李娜, 然后保存
+可见可交互元素:
+[E1] button "保存"      enabled=false
+[E2] select "经办人"    value="张伟"
+[E3] textbox "标题"     value="登录页报错"
+[E4] button "取消"
+[E5] link   "附件:log.txt"
+已知: 未做任何修改时, "保存"按钮为禁用状态(enabled=false)。
+
+【问题】
+id=q1, type=choice: 下一步应该操作哪个元素?`;
+
+const P_B = `【情景】
+应用: 内部订单管理页 (http://oms.local/order/88213)
+目标: 定位"提交订单后页面白屏"的原因
+刚刚的操作序列: 点[E9 提交] -> 页面变成空白, 控制台出现红色报错
+可见可交互元素:
+${ELS20.map(e => { const i = e.indexOf('  '); return '[' + e.slice(0,i) + '] ' + e.slice(i+2); }).join('\n')}
+
+【问题】
+id=q1, type=choice: 现在最该查看/操作哪个元素, 才能确定白屏原因?`;
+
+const P_C = `【情景】
+应用: 工单系统 工作项详情页
+目标: 把该工作项的"经办人"从 张伟 改成 李娜, 并保存成功
+当前状态:
+  select "经办人"  value="李娜"
+  button "保存"    enabled=true
+  顶部提示条: "保存成功" (绿色, 3 秒前出现)
+
+【问题】
+id=q1, type=noul: 上述目标是否已经达成?`;
+
+const P_E = `【情景】
+应用: 工单系统 工作项详情页
+目标: 把"经办人"从 张伟 改成 李娜, 然后保存
+可见可交互元素:
+[E1] button "保存" enabled=false
+[E2] select "经办人" value="张伟"
+[E3] textbox "标题" value="登录页报错"
+[E4] button "取消"
+已知: 未做任何修改时"保存"按钮为禁用状态。
+
+【问题】(两题彼此独立, 不得互相参照)
+id=q1, type=choice: 下一步应该操作哪个元素?
+id=q2, type=noul:   此刻立刻点"保存"能成功保存吗?`;
+
+const P_F = `【情景】
+应用: 内部审批系统 工单 #771
+目标: 让该工单进入"已解决"状态
+证据A: 工单状态="处理中", button "解决" enabled=true 且可见
+证据B: 同一页面 tagged "待客户确认", 帮助文本: "待客户确认状态下请勿手动解决, 需等待客户回复"
+证据C: 该工单已超期 11 天
+可见元素: [X] button "解决"  [Y] link "等待客户确认"  [Z] button "升级给人工"
+
+【问题】
+id=q1, type=choice: 下一步应该做什么? (证据之间存在冲突, 请按真实把握程度作答)`;
+
+const PRESETS = [
+  { name: 'A 5选项·明确',   prompt: P_A, options: 'E1\nE2\nE3\nE4\nE5', truth: 'E2' },
+  { name: 'B 20选项·干扰',  prompt: P_B, options: Array.from({length:20},(_,i)=>'E'+(i+1)).join('\n'), truth: 'E10' },
+  { name: 'C noul·目标达成', prompt: P_C, options: 'yes\nno', truth: 'yes' },
+  { name: 'E 双题隔离',      prompt: P_E, options: 'E1\nE2\nE3\nE4', truth: 'E2 + no' },
+  { name: 'F 证据冲突·校准', prompt: P_F, options: 'X\nY\nZ', truth: '无唯一解（期望摊开）' },
+];
+
+/* ============================== 工具 ============================== */
+const $ = id => document.getElementById(id);
+
+function h(tag, attrs, ...kids){
+  const n = document.createElement(tag);
+  if (attrs) for (const k in attrs){
+    const v = attrs[k];
+    if (v == null) continue;
+    if (k === 'class') n.className = v;
+    else if (k === 'text') n.textContent = v;
+    else if (k === 'style') Object.assign(n.style, v);
+    else if (k.startsWith('on')) n.addEventListener(k.slice(2).toLowerCase(), v);
+    else n.setAttribute(k, v);
+  }
+  kids.flat(3).forEach(c => {
+    if (c == null || c === false) return;
+    n.appendChild(typeof c === 'object' ? c : document.createTextNode(String(c)));
+  });
+  return n;
+}
+const labelsOf = t => String(t || '').split(/[\s,\/|]+/).map(s => s.trim()).filter(Boolean);
+const ms = n => n == null ? '—' : (n >= 1000 ? (n/1000).toFixed(2) + ' s' : Math.round(n) + ' ms');
+const money = n => '$' + n.toFixed(6);
+
+function usd(u){
+  let miss = u.prompt_cache_miss_tokens || 0;
+  if (!miss && !u.prompt_cache_hit_tokens) miss = u.prompt_tokens || 0;
+  return miss/1e6*PRICE.miss + (u.prompt_cache_hit_tokens||0)/1e6*PRICE.hit + (u.completion_tokens||0)/1e6*PRICE.out;
+}
+const jevUsd = u => (u.prompt_tokens||0)/1e6*PRICE.jevIn;
+
+function sortedProbs(probs){
+  const rows = Object.keys(probs || {}).map(k => ({ k, v: Number(probs[k]) || 0 }));
+  let sum = 0; rows.forEach(r => sum += r.v);
+  rows.forEach(r => r.p = sum > 0 ? r.v/sum : 0);
+  rows.sort((a,b) => b.p - a.p);
+  return { rows, sum };
+}
+
+/* ============================== 密钥 ============================== */
+const KEY_STORE = 'jev_dsk_key';
+function getKey(){ return $('key').value.trim(); }
+function refreshKeyState(){
+  const k = getKey();
+  $('keyState').textContent = k ? (k.slice(0,7) + '…' + k.slice(-4) + ' · ' + k.length + ' 字符') : '未填';
+  $('keyState').className = 'mono ' + (k ? 'muted' : 'muted');
+}
+(function initKey(){
+  let saved = '';
+  try { saved = localStorage.getItem(KEY_STORE) || ''; } catch(e){}
+  if (saved) $('key').value = saved;
+  refreshKeyState();
+})();
+$('key').addEventListener('input', refreshKeyState);
+$('keyToggle').addEventListener('click', () => {
+  const t = $('key').type === 'password';
+  $('key').type = t ? 'text' : 'password';
+  $('keyToggle').textContent = t ? '隐藏' : '显示';
+});
+$('keySave').addEventListener('click', () => {
+  try { localStorage.setItem(KEY_STORE, getKey()); $('keySave').textContent = '已记住 ✓';
+        setTimeout(() => $('keySave').textContent = '记住', 1200); } catch(e){ alert('localStorage 不可用'); }
+});
+
+/* ============================== 表单 ============================== */
+$('sys').value = DEFAULT_SYSTEM;
+$('prompt').value = P_A;
+$('opts').value = 'E1\nE2\nE3\nE4\nE5';
+
+function syncSys(){ $('sysLen').textContent = $('sys').value.length + ' 字符'; }
+function syncOpts(){ $('optCount').textContent = labelsOf($('opts').value).length + ' 个选项'; }
+$('sys').addEventListener('input', syncSys);
+$('opts').addEventListener('input', syncOpts);
+syncSys(); syncOpts();
+
+$('sysToggle').addEventListener('click', () => {
+  const w = $('sysWrap');
+  const open = w.style.display !== 'none';
+  w.style.display = open ? 'none' : 'block';
+  $('sysToggle').textContent = open ? '展开' : '收起';
+});
+$('sysReset').addEventListener('click', () => { $('sys').value = DEFAULT_SYSTEM; syncSys(); });
+
+document.querySelectorAll('button.preset').forEach(b => {
+  b.addEventListener('click', () => {
+    const p = PRESETS[+b.dataset.i];
+    $('prompt').value = p.prompt;
+    $('opts').value = p.options;
+    syncOpts();
+  });
+});
+
+/* ============================== 调用 ============================== */
+async function callOnce(sys, userText, useStream){
+  const key = getKey();
+  if (!key) throw new Error('请先填右上角的 API KEY');
+  const body = {
+    model: 'deepseek-flash',
+    messages: [{ role:'system', content: sys }, { role:'user', content: userText }],
+    response_format: { type: 'json_object' },
+    thinking: { type: 'disabled' },
+    temperature: 0,
+  };
+  if (useStream) { body.stream = true; body.stream_options = { include_usage: true }; }
+
+  const t0 = performance.now();
+  const resp = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json', 'Authorization':'Bearer ' + key },
+    body: JSON.stringify(body),
+  });
+
+  if (!useStream){
+    const totalMs = performance.now() - t0;
+    const data = await resp.json();
+    if (!resp.ok || data.error) throw new Error('HTTP ' + resp.status + ' ' + JSON.stringify(data.error || data));
+    const msg = (data.choices && data.choices[0] && data.choices[0].message) || {};
+    return { totalMs, ttftMs: null, usage: data.usage || {}, content: msg.content || '', model: data.model || '' };
+  }
+
+  // ---- 流式：取首 chunk 时间做 TTFT ----
+  if (!resp.ok) throw new Error('HTTP ' + resp.status + ' ' + (await resp.text()).slice(0,300));
+  const reader = resp.body.getReader();
+  const dec = new TextDecoder();
+  let buf = '', content = '', usage = null, ttftMs = null;
+  for(;;){
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    const lines = buf.split('\n');
+    buf = lines.pop();
+    for (const raw of lines){
+      const line = raw.trim();
+      if (!line.startsWith('data:')) continue;
+      const payload = line.slice(5).trim();
+      if (payload === '[DONE]') continue;
+      let ch; try { ch = JSON.parse(payload); } catch(e){ continue; }
+      if (ch.usage) usage = ch.usage;
+      const d = (ch.choices && ch.choices[0] && ch.choices[0].delta) || {};
+      if (d.content){
+        if (ttftMs === null) ttftMs = performance.now() - t0;
+        content += d.content;
+      }
+    }
+  }
+  return { totalMs: performance.now() - t0, ttftMs, usage: usage || {}, content, model: 'deepseek-flash' };
+}
+
+/* ============================== 渲染 ============================== */
+let seq = 0;
+let logRows = [];
+
+function renderResult(r, caseName){
+  const box = $('result');
+  box.textContent = '';
+  if (r.error){
+    box.className = '';
+    box.appendChild(h('div', { class:'err', text:'✕ ' + r.error }));
+    return;
+  }
+  box.className = '';
+  const u = r.usage || {};
+  const cost = usd(u), jcost = jevUsd(u);
+
+  const chips = h('div', { class:'chips' },
+    h('span', { class:'chip' }, '延迟 ', h('b', {text: ms(r.totalMs)})),
+    r.ttftMs != null ? h('span', { class:'chip' }, 'TTFT ', h('b', {text: ms(r.ttftMs)})) : null,
+    h('span', { class:'chip' }, 'in ', h('b', {text: String(u.prompt_tokens||0)})),
+    h('span', { class:'chip' }, 'out ', h('b', {text: String(u.completion_tokens||0)})),
+    h('span', { class:'chip', title:'前缀缓存命中' }, 'hit ', h('b', {text: String(u.prompt_cache_hit_tokens||0)})),
+    h('span', { class:'chip' }, 'miss ', h('b', {text: String(u.prompt_cache_miss_tokens||0)})),
+    h('span', { class:'chip ok' }, '花费 ', h('b', {text: money(cost)})),
+    h('span', { class:'chip warn', title:'按 Jev 公开价 $0.042/M 输入、输出免费估算' }, 'Jev 同 token ', h('b', {text: money(jcost)})),
+    h('span', { class:'chip' }, '倍数 ', h('b', {text: jcost > 0 ? (cost/jcost).toFixed(2) + '×' : '—'})),
+    caseName ? h('span', { class:'chip' }, caseName) : null
+  );
+  box.appendChild(chips);
+  box.appendChild(h('div', { class:'hr' }));
+
+  let parsed = null, perr = null;
+  try { parsed = JSON.parse(r.content); } catch(e){ perr = String(e.message || e); }
+  const answers = parsed && Array.isArray(parsed.answers) && parsed.answers.length ? parsed.answers : null;
+
+  if (perr) box.appendChild(h('div', { class:'err', text:'JSON 解析失败: ' + perr }));
+
+  if (answers){
+    answers.forEach((a, i) => {
+      const sp = sortedProbs(a.probs);
+      box.appendChild(h('div', { class:'chips', style:{ marginBottom:'4px' } },
+        h('span', { class:'chip' }, 'id=', h('b', {text: String(a.id || ('q'+(i+1)))} )),
+        h('span', { class:'chip' }, String(a.type || '-')),
+        h('span', { class:'chip ok' }, 'best=', h('b', {text: String(a.best)})),
+        h('span', { class:'chip' }, 'conf ', h('b', {text: String(a.conf)})),
+        h('span', { class:'chip' }, '原始合计 ', h('b', {text: sp.sum.toFixed(3)}), ' → 已归一化')
+      ));
+      sp.rows.forEach(row => {
+        box.appendChild(h('div', { class:'line' },
+          h('div', { class:'mono ell', title: row.k, text: row.k }),
+          h('div', { class:'bar' + (String(a.best) === row.k ? ' win' : '') },
+            h('i', { style:{ width: Math.max(1.5, row.p*100) + '%' } })),
+          h('div', { class:'mono muted', style:{ textAlign:'right' } }, (row.p*100).toFixed(1) + '%')
+        ));
+      });
+      if (i < answers.length - 1) box.appendChild(h('div', { class:'hr' }));
+    });
+  } else if (!perr){
+    box.appendChild(h('div', { class:'muted', text:'不是预期的 answers 结构，见下方原始响应。' }));
+  }
+
+  box.appendChild(h('details', null,
+    h('summary', null, '原始响应 JSON'),
+    h('pre', { text: r.content || '(空)' })
+  ));
+}
+
+function addLog(caseName, r){
+  const u = r.usage || {};
+  const row = {
+    n: ++seq, name: caseName,
+    best: r.best ?? '—', conf: r.conf ?? '—', nopt: r.nopt ?? '—',
+    totalMs: r.totalMs, ttftMs: r.ttftMs,
+    pin: u.prompt_tokens||0, pout: u.completion_tokens||0,
+    hit: u.prompt_cache_hit_tokens||0, miss: u.prompt_cache_miss_tokens||0,
+    cost: r.error ? 0 : usd(u),
+  };
+  logRows.push(row);
+  renderLog();
+}
+function renderLog(){
+  const tb = $('log');
+  tb.textContent = '';
+  if (!logRows.length){
+    tb.appendChild(h('tr', null, h('td', { colspan:'13', class:'muted', style:{textAlign:'center'} }, '还没有记录')));
+  } else {
+    logRows.forEach(r => tb.appendChild(h('tr', null,
+      h('td', { text: String(r.n) }),
+      h('td', { text: r.name }),
+      h('td', { text: String(r.best) }),
+      h('td', { text: String(r.conf) }),
+      h('td', { text: String(r.nopt) }),
+      h('td', { text: ms(r.totalMs) }),
+      h('td', { text: ms(r.ttftMs) }),
+      h('td', { text: String(r.pin) }),
+      h('td', { text: String(r.pout) }),
+      h('td', { text: String(r.hit) }),
+      h('td', { text: String(r.miss) }),
+      h('td', { text: money(r.cost) }),
+      h('td', { text: money((r.pin)/1e6*PRICE.jevIn) })
+    )));
+  }
+  const total = logRows.reduce((a,b) => a + b.cost, 0);
+  const jev = logRows.reduce((a,b) => a + b.pin/1e6*PRICE.jevIn, 0);
+  const lat = logRows.filter(r => r.totalMs != null).map(r => r.totalMs).sort((a,b)=>a-b);
+  const med = lat.length ? lat[Math.floor(lat.length/2)] : null;
+  $('totals').textContent = logRows.length
+    ? `${logRows.length} 次 · 中位延迟 ${ms(med)} · 合计 ${money(total)} · Jev 同 token ${money(jev)} · 倍差 ${jev>0?(total/jev).toFixed(2)+'×':'—'}`
+    : '';
+}
+$('clearLog').addEventListener('click', () => { logRows = []; seq = 0; renderLog(); });
+
+/* ============================== 执行 ============================== */
+async function runOne(caseName){
+  const sys = $('sys').value;
+  const labs = labelsOf($('opts').value);
+  const user = $('prompt').value + (labs.length ? '\n【选项】 ' + labs.join(' / ') : '');
+  $('result').textContent = '';
+  $('result').className = 'muted';
+  $('result').textContent = '请求中…';
+  let r;
+  try {
+    r = await callOnce(sys, user, $('stream').checked);
+    r.nopt = labs.length;
+  } catch(e){
+    r = { error: String(e && e.message || e) };
+  }
+  // 抽出首题的 best/conf 用于表格
+  if (!r.error){
+    try {
+      const j = JSON.parse(r.content);
+      const a0 = j.answers && j.answers[0];
+      if (a0){ r.best = a0.best; r.conf = a0.conf; }
+      if (j.answers && j.answers.length > 1) r.best = j.answers.map(x => x.best).join(' / ');
+    } catch(e){}
+  }
+  renderResult(r, caseName);
+  addLog(caseName, r);
+  return r;
+}
+
+$('send').addEventListener('click', async () => {
+  const n = Math.max(1, Math.min(5, +$('repeat').value || 1));
+  $('send').disabled = true;
+  try { for (let i = 0; i < n; i++) await runOne('手动 ' + (i+1) + '/' + n); }
+  finally { $('send').disabled = false; }
+});
+
+$('sendAll').addEventListener('click', async () => {
+  $('sendAll').disabled = true;
+  $('send').disabled = true;
+  const keepP = $('prompt').value, keepO = $('opts').value;
+  try {
+    for (const p of PRESETS){
+      $('prompt').value = p.prompt;
+      $('opts').value = p.options;
+      syncOpts();
+      await runOne(p.name);
+    }
+  } finally {
+    $('prompt').value = keepP;
+    $('opts').value = keepO;
+    syncOpts();
+    $('sendAll').disabled = false;
+    $('send').disabled = false;
+  }
+});
+</script>
+</body>
+</html>

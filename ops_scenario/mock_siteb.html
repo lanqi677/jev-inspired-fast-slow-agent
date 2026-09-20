@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>SiteB · 组织机构用户管理</title>
+<style>
+ body{margin:0;font:13px/1.6 -apple-system,"Source Han Sans SC","Microsoft YaHei",sans-serif;background:#eef1f6;color:#1b1e23}
+ .top{height:48px;background:#0f3d6e;color:#fff;display:flex;align-items:center;padding:0 18px;gap:18px}
+ .top b{font-weight:600}
+ .top .sp{margin-left:auto}
+ .top button{background:transparent;color:#cfe0f5;border:1px solid #3a6ea5;padding:4px 14px;border-radius:5px;font:inherit;cursor:pointer}
+ .wrap{padding:18px 22px}
+ .crumb{color:#61676f;margin-bottom:12px}
+ .card{background:#fff;border:1px solid #dde2e9;border-radius:8px;padding:14px 16px}
+ table{width:100%;border-collapse:collapse;margin-top:10px}
+ th,td{padding:8px 10px;text-align:left;border-bottom:1px solid #eef1f5}
+ th{background:#f6f8fb;color:#61676f;font-weight:600}
+ button.primary{background:#1a5fb4;border:none;color:#fff;font-weight:600;padding:7px 16px;border-radius:6px;font:inherit;cursor:pointer}
+ button{font:inherit;cursor:pointer}
+ select,input{font:inherit;padding:6px 9px;border:1px solid #c4ccd6;border-radius:6px;background:#fff}
+ .modal{position:fixed;inset:0;background:rgba(12,24,40,.45);display:flex;align-items:center;justify-content:center}
+ .modal .box{background:#fff;border-radius:10px;padding:22px 24px;width:420px;box-shadow:0 14px 44px rgba(0,0,0,.24)}
+ .modal h3{margin:0 0 14px;font-size:15px}
+ .fld{margin-bottom:12px}
+ .fld label{display:block;color:#61676f;margin-bottom:4px}
+ .fld select,.fld input{width:100%}
+ .panel{position:fixed;top:0;right:0;width:400px;height:100vh;background:#fff;border-left:1px solid #d8dbe1;box-shadow:-6px 0 22px rgba(0,0,0,.1);padding:18px 20px}
+ .panel h3{margin:0 0 14px;font-size:15px}
+ .kv{display:flex;padding:8px 0;border-bottom:1px solid #f0f1f5}
+ .kv b{width:104px;color:#61676f;font-weight:400;flex:none}
+ .hidden{display:none!important}
+ .empty{padding:24px;text-align:center;color:#9aa1ab}
+</style></head><body>
+<div class="top"><b>SiteB 统一身份管理</b><span>组织机构 / 用户管理</span>
+  <div class="sp"><button id="logout">退出</button><button id="login">登陆</button></div>
+</div>
+<div class="wrap">
+  <div class="crumb">首页 / 用户中心 / <b>组织用户管理</b></div>
+  <div class="card">
+    <div style="display:flex;gap:10px;align-items:center">
+      <span>组织用户列表</span>
+      <button id="refresh" style="margin-left:auto">刷新</button>
+      <button>导出</button>
+    </div>
+    <table><thead><tr><th>姓名</th><th>用户名</th><th>邮箱</th><th>状态</th><th>操作</th></tr></thead>
+      <tbody id="rows"><tr><td colspan="5" class="empty">请先点击右上角「登陆」</td></tr></tbody></table>
+  </div>
+</div>
+
+<div id="loginModal" class="modal hidden" role="dialog" aria-label="用户登录">
+  <div class="box">
+    <h3>用户登录</h3>
+    <div class="fld"><label for="loginType">选择用户名</label>
+      <select id="loginType"><option>用户名</option><option>手机号</option><option>邮箱</option></select></div>
+    <div class="fld"><label for="loginId">请输入工号</label>
+      <input id="loginId" placeholder="工号" aria-label="工号"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button id="cancelLogin">取消</button>
+      <button id="doLogin" class="primary">确定</button>
+    </div>
+  </div>
+</div>
+
+<div id="panel" class="panel hidden" role="dialog" aria-label="用户详情">
+  <h3>用户详情</h3>
+  <div id="pBody"></div>
+  <div style="margin-top:18px"><button id="pClose">关闭</button></div>
+</div>
+
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i)};
+  var V=new URLSearchParams(location.search).get('v')||'ok';
+  var REC={
+    stale:{ name:'张三', user:'123', email:'old123@internal.example', updated:'2026-09-20 02:10' },
+    ok:   { name:'张三', user:'123', email:'123@123.com',       updated:'TODAY 09:12' },
+    old:  { name:'张三', user:'123', email:'123@123.com',       updated:'2026-09-18 17:40' }
+  }[V]||{ name:'张三', user:'123', email:'123@123.com', updated:'TODAY 09:12' };
+  var today=new Date();
+  var todayStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+  var updated = /^TODAY/.test(REC.updated) ? todayStr+' 09:12' : REC.updated;
+
+  $('login').addEventListener('click',function(){ $('loginModal').classList.remove('hidden') });
+  $('cancelLogin').addEventListener('click',function(){ $('loginModal').classList.add('hidden') });
+  $('doLogin').addEventListener('click',function(){
+    var id=$('loginId').value.trim();
+    $('loginModal').classList.add('hidden');
+    if(id!=='123'){ $('rows').innerHTML='<tr><td colspan="5" class="empty">未查询到该用户</td></tr>'; return; }
+    $('rows').innerHTML='<tr><td>'+REC.name+'</td><td>'+REC.user+'</td><td>'+REC.email
+      +'</td><td>正常</td><td><button id="detail">详情</button></td></tr>';
+    $('detail').addEventListener('click',function(){
+      $('panel').classList.remove('hidden');
+      $('pBody').innerHTML=
+        '<div class="kv"><b>姓名</b><span>'+REC.name+'</span></div>'
+       +'<div class="kv"><b>工号</b><span>'+REC.user+'</span></div>'
+       +'<div class="kv"><b>邮箱</b><span id="dEmail">'+REC.email+'</span></div>'
+       +'<div class="kv"><b>信息更新时间</b><span id="dUpdated">'+updated+'</span></div>'
+       +'<div class="kv"><b>同步状态</b><span>已同步</span></div>';
+    });
+  });
+  $('pClose').addEventListener('click',function(){ $('panel').classList.add('hidden') });
+  $('logout').addEventListener('click',function(){ $('rows').innerHTML='<tr><td colspan="5" class="empty">请先点击右上角「登陆」</td></tr>' });
+  $('refresh').addEventListener('click',function(){});
+})();
+</script></body></html>

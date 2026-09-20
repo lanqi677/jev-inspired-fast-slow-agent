@@ -1,0 +1,53 @@
+{
+  "id": "sitea",
+  "name": "SiteA 成员管理（配置中心 → 全部成员）",
+  "kind": "dom",
+  "host": "sitea.internal.example",
+  "verified": "2026-09-20",
+
+  "auth": { "kind": "sso", "note": "集团 SSO。登录态存在浏览器 profile 里，登录一次长期有效" },
+
+  "ready": { "selector": ".memberList-account", "note": "计数元素出现即视为页面就绪" },
+
+  "perceive": {
+    "rowSelector": ".ui-table-body .ui-table-row",
+    "statusSelector": ".memberList-account",
+    "note": "行不是 <tr> 而是 div。行内 ctx（『这一行的文字』）靠 rowSelector 取，否则 100+ 元素时分不清是哪个『编辑』"
+  },
+
+  "count": {
+    "kind": "text",
+    "selector": ".ui-table-header .memberList-account",
+    "pattern": "用户名\\s*\\((\\d+)\\)",
+    "note": "【唯一可靠判据】0=不存在，>=1=存在。注意：.memberList-account 全页有 23 个（1 个表头 + 22 个行内姓名格），只有【表头】那个带数字，所以必须带 .ui-table-header 限定。绝对不要用行数——行数封顶 22（分页），931 条和 9353 条读出来都是 22"
+  },
+
+  "rows": { "selector": ".ui-table-body .ui-table-row", "type": "div", "note": "全页 .ui-table-row 共 23 个 = 22 数据行 + 1 表头行；表头不在 .ui-table-body 里，所以这个选择器正好只要数据行" },
+
+  "columns": {
+    "name": 1, "email": 2, "department": 3, "groupId": 4, "company": 5,
+    "title": 6, "supervisor": 7, "empId": 8, "inviter": 9, "status": 10, "actions": 11
+  },
+
+  "search": {
+    "selector": "input[placeholder*=\"查找成员\"]",
+    "trigger": "input",
+    "note": "输入即搜。没有搜索按钮，也不需要回车"
+  },
+
+  "wait": {
+    "strategy": "pollCountStable",
+    "onActions": ["fill"],
+    "afterFillMs": 60,
+    "intervalMs": 500,
+    "timeoutMs": 12000,
+    "observedMs": [1700, 3200],
+    "note": "有防抖。必须等到【连续两次读到同一个非 null 计数】才算稳——只 sleep 固定时间会读到中间态"
+  },
+
+  "guards": { "block": ["删除", "移除", "注销", "退出登录", "支付", "转账"] },
+
+  "fields": {},
+
+  "detailEntry": { "kind": "unknown", "note": "待侦察：点进成员详情的方式还没确认" }
+}

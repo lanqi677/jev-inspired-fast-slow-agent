@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>工单系统 工作项详情 #1042</title>
+<style>
+  body{margin:0;font:13px/1.6 -apple-system,"Source Han Sans SC","Microsoft YaHei",sans-serif;background:#f5f6f8;color:#1b1e23}
+  .top{height:46px;background:#2b3a55;color:#fff;display:flex;align-items:center;padding:0 16px;font-weight:600}
+  .wrap{display:flex}
+  .nav{width:170px;background:#eef1f5;min-height:calc(100vh - 46px);padding-top:10px}
+  .nav div{padding:8px 16px;color:#3a4356;cursor:pointer}
+  .nav div.on{color:#2f6df6;font-weight:600}
+  .main{flex:1;padding:18px 22px}
+  h1{font-size:19px;margin:0 0 4px}
+  .status{display:inline-block;padding:2px 10px;border-radius:999px;background:#fff4e0;color:#c47f00;font-size:12px;font-weight:600}
+  .card{background:#fff;border:1px solid #e2e4e9;border-radius:8px;padding:14px;margin-top:12px}
+  .row{display:flex;align-items:center;margin-bottom:10px}
+  .row label{width:88px;color:#61676f;flex:none}
+  input,select,textarea{font:inherit;padding:5px 8px;border:1px solid #c8ccd4;border-radius:6px;background:#fff;min-width:260px}
+  textarea{min-height:56px;vertical-align:top}
+  button{font:inherit;padding:7px 16px;border:1px solid #c8ccd4;border-radius:6px;background:#fff;cursor:pointer}
+  button.primary{background:#2f6df6;border-color:#2f6df6;color:#fff;font-weight:600}
+  button.primary:disabled{background:#c8ccd4;border-color:#c8ccd4;cursor:not-allowed}
+  button.danger{color:#d92d20;border-color:#f0b4ae}
+  .bar{display:flex;gap:10px;align-items:center;margin-top:14px}
+  .bar .right{margin-left:auto;display:flex;gap:10px}
+  .alert{margin-top:12px;padding:9px 12px;border-radius:6px;font-size:13px}
+  .alert.ok{background:#e8f7ee;color:#12a150;border:1px solid #b6e6c9}
+  .alert.err{background:#fdecea;color:#d92d20;border:1px solid #f3b6b0}
+  .hidden{display:none!important}
+  .modal{position:fixed;inset:0;background:rgba(20,26,38,.42);display:flex;align-items:center;justify-content:center}
+  .modal .box{background:#fff;border-radius:10px;padding:20px 22px;min-width:340px;box-shadow:0 12px 40px rgba(0,0,0,.22)}
+  .modal h3{margin:0 0 8px;font-size:15px}
+  .modal p{margin:0 0 16px;color:#61676f}
+  .modal .row2{display:flex;gap:10px;justify-content:flex-end}
+  .hist{margin-top:8px}
+  .hist div{padding:7px 0;border-bottom:1px solid #eef1f5;color:#3a4356}
+</style>
+</head>
+<body>
+<div class="top">工单系统 工作项详情</div>
+<div class="wrap">
+  <div class="nav">
+    <div>我的工作台</div>
+    <div class="on">工作项</div>
+    <div>迭代</div>
+    <div>测试</div>
+    <div>报表</div>
+    <div>设置</div>
+  </div>
+  <div class="main">
+    <h1>登录页报错 #1042</h1>
+    <div><span class="status" role="status" id="status">处理中</span></div>
+
+    <div class="card">
+      <div class="row">
+        <label for="assignee">经办人</label>
+        <select id="assignee" aria-label="经办人">
+          <option value="张伟" selected>张伟</option>
+          <option value="李娜">李娜</option>
+          <option value="王芳">王芳</option>
+        </select>
+      </div>
+      <div class="row">
+        <label for="priority">优先级</label>
+        <select id="priority" aria-label="优先级">
+          <option value="低">低</option>
+          <option value="中" selected>中</option>
+          <option value="高">高</option>
+        </select>
+      </div>
+      <div class="row">
+        <label for="title">标题</label>
+        <input id="title" aria-label="标题" value="登录页报错">
+      </div>
+      <div class="row">
+        <label for="memo">备注</label>
+        <textarea id="memo" aria-label="备注" placeholder="补充说明…"></textarea>
+      </div>
+      <div class="bar">
+        <button id="addComment">添加评论</button>
+        <button id="export">导出</button>
+        <button id="print">打印</button>
+        <button id="del" class="danger">删除</button>
+        <div class="right">
+          <button id="cancel">取消</button>
+          <button id="save" class="primary" disabled>保存</button>
+          <button id="submit" class="primary">提交</button>
+        </div>
+      </div>
+      <div id="msg" class="alert ok hidden" role="alert"></div>
+    </div>
+
+    <div class="card hist">
+      <div>李娜 · 09-18 14:22 — 已定位到登录接口在 token 过期后未刷新</div>
+      <div>王芳 · 09-18 16:05 — 复现步骤: 打开登录页 → 等待 30 分钟 → 点击提交</div>
+      <div>张伟 · 09-19 09:11 — 日志: WARN auth.TokenStore - refresh skipped</div>
+    </div>
+  </div>
+</div>
+
+<div id="modal" class="modal hidden" role="dialog" aria-label="确认提交">
+  <div class="box">
+    <h3>确认提交该工作项?</h3>
+    <p>提交后状态将变为「已提交」，不可再修改。</p>
+    <div class="row2">
+      <button id="modalCancel">再想想</button>
+      <button id="modalOk" class="primary">确认提交</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id) };
+  var saved = false;
+
+  function dirty(){ return !saved && ($('assignee').value !== '张伟' || $('priority').value !== '中' || $('title').value !== '登录页报错'); }
+  function refresh(){ $('save').disabled = !dirty() }
+  ['assignee','priority','title'].forEach(function(id){ $(id).addEventListener('change', refresh); $(id).addEventListener('input', refresh) });
+
+  function msg(text, kind){
+    var m = $('msg'); m.textContent = text; m.className = 'alert ' + kind; m.classList.remove('hidden');
+  }
+
+  $('save').addEventListener('click', function(){
+    saved = true; refresh();
+    msg('已保存。经办人: ' + $('assignee').value + '，优先级: ' + $('priority').value, 'ok');
+  });
+  $('submit').addEventListener('click', function(){ $('modal').classList.remove('hidden') });
+  $('modalCancel').addEventListener('click', function(){ $('modal').classList.add('hidden') });
+  $('modalOk').addEventListener('click', function(){
+    $('modal').classList.add('hidden');
+    $('status').textContent = '已提交';
+    $('status').style.background = '#e8f7ee'; $('status').style.color = '#12a150';
+    msg('工作项已提交。', 'ok');
+  });
+  $('del').addEventListener('click', function(){
+    $('status').textContent = '已删除'; msg('危险操作: 工作项已被删除!', 'err');
+  });
+  $('cancel').addEventListener('click', function(){ location.reload() });
+  $('export').addEventListener('click', function(){ msg('已导出 1 条记录。','ok') });
+  $('print').addEventListener('click', function(){ msg('已发送到打印队列。','ok') });
+  $('addComment').addEventListener('click', function(){ msg('评论框已展开。','ok') });
+  refresh();
+})();
+</script>
+</body>
+</html>

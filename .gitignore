@@ -1,0 +1,22 @@
+# 依赖与缓存
+node_modules/
+__pycache__/
+*.pyc
+
+# 浏览器 profile（含登录态 / Cookies，永不入库）
+.chrome/
+.chrome-real/
+.chrome-headed/
+
+# 本地模型与工具链（体积大，结论已在文档里）
+models/
+tools/
+src/
+tmp/
+pylibs/
+llama.cpp/
+
+# 临时文件
+.body.json
+:memory:.ses
+*.log

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>SiteA · 全部成员</title>
+<style>
+ body{margin:0;font:13px/1.6 -apple-system,"Source Han Sans SC","Microsoft YaHei",sans-serif;background:#f0f2f5;color:#1b1e23}
+ .top{height:46px;background:#1f2d4a;color:#fff;display:flex;align-items:center;padding:0 16px;gap:16px}
+ .top b{font-weight:600}
+ .wrap{padding:16px 20px;max-width:1100px}
+ .bar{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #e2e4e9;border-radius:8px;padding:10px 12px;margin-bottom:12px}
+ input{font:inherit;padding:6px 10px;border:1px solid #c8ccd4;border-radius:6px;width:320px}
+ button{font:inherit;padding:6px 14px;border:1px solid #c8ccd4;border-radius:6px;background:#fff;cursor:pointer}
+ button.primary{background:#2f6df6;border-color:#2f6df6;color:#fff;font-weight:600}
+ table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e2e4e9;border-radius:8px;overflow:hidden}
+ th,td{padding:8px 10px;text-align:left;border-bottom:1px solid #eef1f5}
+ th{background:#f7f8fa;color:#61676f;font-weight:600}
+ .empty{padding:26px;text-align:center;color:#9aa1ab;background:#fff;border:1px solid #e2e4e9;border-radius:8px}
+ .panel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#fff;border-left:1px solid #d8dbe1;box-shadow:-6px 0 22px rgba(0,0,0,.1);padding:16px 18px}
+ .panel h3{margin:0 0 12px;font-size:15px}
+ .kv{display:flex;padding:7px 0;border-bottom:1px solid #f0f1f5}
+ .kv b{width:88px;color:#61676f;font-weight:400;flex:none}
+ .hidden{display:none!important}
+</style></head><body>
+<div class="top"><b>SiteA</b><span>项目 / 协作平台 / 团队设置 / 全部成员</span></div>
+<div class="wrap">
+  <div class="bar" id="bar">
+    <span>部门全部成员</span>
+    <input id="kw" aria-label="搜索成员" placeholder="输入姓名 / 工号 / 邮箱搜索">
+    <button id="go" class="primary">搜索</button>
+    <button id="clr">重置</button>
+    <span id="hint" style="color:#9aa1ab;margin-left:auto"></span>
+  </div>
+  <div id="result"></div>
+</div>
+<div id="panel" class="panel hidden" role="dialog" aria-label="成员详情">
+  <h3 id="pName">成员详情</h3>
+  <div id="pBody"></div>
+  <div style="margin-top:16px"><button id="pClose">关闭</button></div>
+</div>
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i)};
+  var V=new URLSearchParams(location.search).get('v')||'notfound';
+  // 成员库：按 variant 决定"搜工号"和"搜邮箱"分别命中什么
+  var DB={
+    user_problem:{ byId:{'123':[{name:'张三',email:'123@123.com',empId:'123'}]}, byEmail:{} },
+    empty_id:    { byId:{}, byEmail:{'123@123.com':[{name:'张三',email:'123@123.com',empId:''}]} },
+    dup_email:   { byId:{}, byEmail:{'123@123.com':[{name:'李四',email:'123@123.com',empId:'888'}]} },
+    notfound:    { byId:{}, byEmail:{} }
+  }[V]||{byId:{},byEmail:{}};
+  function render(rows,kw){
+    if(!rows.length){ $('result').innerHTML='<div class="empty">没有找到匹配的成员</div>'; $('hint').textContent='0 条'; return; }
+    var h='<table><thead><tr><th>姓名</th><th>工号</th><th>邮箱</th><th>操作</th></tr></thead><tbody>';
+    rows.forEach(function(r,i){
+      h+='<tr><td>'+r.name+'</td><td>'+(r.empId||'')+'</td><td>'+r.email+'</td>'
+       +'<td><button class="detail" data-i="'+i+'">查看详情</button></td></tr>';
+    });
+    h+='</tbody></table>';
+    $('result').innerHTML=h; $('hint').textContent=rows.length+' 条';
+    document.querySelectorAll('.detail').forEach(function(b){
+      b.addEventListener('click',function(){ openDetail(rows[+b.getAttribute('data-i')]) });
+    });
+  }
+  function openDetail(r){
+    $('panel').classList.remove('hidden');
+    $('pName').textContent=r.name;
+    $('pBody').innerHTML=
+      '<div class="kv"><b>姓名</b><span>'+r.name+'</span></div>'
+     +'<div class="kv"><b>工号</b><span id="dEmp">'+(r.empId||'')+'</span></div>'
+     +'<div class="kv"><b>邮箱</b><span>'+r.email+'</span></div>'
+     +'<div class="kv"><b>所属部门</b><span>协作平台 / 研发一部</span></div>';
+  }
+  $('pClose').addEventListener('click',function(){ $('panel').classList.add('hidden') });
+  function doSearch(){
+    var kw=$('kw').value.trim();
+    var rows=(DB.byId[kw]||DB.byEmail[kw]||[]);
+    render(rows,kw);
+  }
+  $('go').addEventListener('click',doSearch);
+  $('kw').addEventListener('keydown',function(e){ if(e.key==='Enter')doSearch() });
+  $('clr').addEventListener('click',function(){ $('kw').value=''; render([],'') });
+  render([],'');
+})();
+</script></body></html>

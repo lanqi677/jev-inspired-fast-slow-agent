@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>工单系统 工单列表 · 真实噪声版</title>
+<style>
+  body{margin:0;font:12.5px/1.6 -apple-system,"Source Han Sans SC","Microsoft YaHei",sans-serif;background:#f5f6f8;color:#1b1e23}
+  .top{height:44px;background:#2b3a55;color:#fff;display:flex;align-items:center;padding:0 14px;gap:14px}
+  .top b{font-weight:600}
+  .top .sp{margin-left:auto;display:flex;gap:10px}
+  .wrap{display:flex}
+  .nav{width:150px;background:#eef1f5;min-height:calc(100vh - 44px);padding-top:8px}
+  .nav div{padding:7px 14px;color:#3a4356;cursor:pointer}
+  .nav div.on{color:#2f6df6;font-weight:600}
+  .main{flex:1;padding:12px 16px;min-width:0}
+  .toolbar{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px}
+  .filters{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:10px;background:#fff;border:1px solid #e2e4e9;border-radius:8px;padding:8px 10px}
+  table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e2e4e9;border-radius:8px;overflow:hidden}
+  th,td{padding:6px 8px;text-align:left;border-bottom:1px solid #eef1f5;white-space:nowrap}
+  th{background:#f7f8fa;color:#61676f;font-weight:600}
+  td .ops{display:flex;gap:5px}
+  button{font:inherit;padding:4px 9px;border:1px solid #c8ccd4;border-radius:5px;background:#fff;cursor:pointer;white-space:nowrap}
+  button:hover{border-color:#8c94a3}
+  button.primary{background:#2f6df6;border-color:#2f6df6;color:#fff;font-weight:600}
+  button.primary:disabled{background:#c8ccd4;border-color:#c8ccd4;cursor:not-allowed}
+  button.danger{color:#d92d20;border-color:#f0b4ae}
+  select,input,textarea{font:inherit;padding:4px 7px;border:1px solid #c8ccd4;border-radius:5px;background:#fff}
+  .pager{display:flex;gap:5px;justify-content:flex-end;margin-top:10px}
+  .status{padding:2px 9px;border-radius:999px;background:#fff4e0;color:#c47f00;font-size:11.5px;font-weight:600}
+  .panel{position:fixed;top:0;right:0;width:400px;height:100vh;background:#fff;border-left:1px solid #d8dbe1;
+         box-shadow:-6px 0 22px rgba(0,0,0,.10);padding:16px 18px;overflow:auto}
+  .panel h2{font-size:15px;margin:0 0 3px}
+  .panel .row{display:flex;align-items:flex-start;margin:9px 0}
+  .panel .row label{width:66px;color:#61676f;flex:none;padding-top:4px}
+  .panel .row .ctl{flex:1}
+  .panel .ctl select,.panel .ctl input,.panel .ctl textarea{width:100%}
+  .panel textarea{min-height:70px}
+  .panel .foot{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:24px;padding:9px 18px;border-radius:8px;
+         background:#e8f7ee;color:#12a150;border:1px solid #b6e6c9;box-shadow:0 6px 20px rgba(0,0,0,.12)}
+  .modal{position:fixed;inset:0;background:rgba(20,26,38,.42);display:flex;align-items:center;justify-content:center}
+  .modal .box{background:#fff;border-radius:10px;padding:18px 20px;min-width:330px}
+  .modal h3{margin:0 0 6px;font-size:14.5px}
+  .modal p{margin:0 0 14px;color:#61676f}
+  .hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="top">
+  <b>工单系统 工作项</b>
+  <span>张伟</span>
+  <div class="sp">
+    <button id="h1">通知</button><button id="h2">帮助</button><button id="h3">退出登录</button>
+  </div>
+</div>
+<div class="wrap">
+  <div class="nav" id="nav"></div>
+  <div class="main">
+    <div class="toolbar" id="toolbar"></div>
+    <div class="filters" id="filters"></div>
+    <table>
+      <thead><tr><th>工单号</th><th>标题</th><th>经办人</th><th>优先级</th><th>状态</th><th>操作</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="pager" id="pager"></div>
+  </div>
+</div>
+
+<div id="panel" class="panel hidden" role="dialog" aria-label="工单详情">
+  <h2 id="pTitle">工单 #1042</h2>
+  <div><span class="status" role="status" id="pStatus">处理中</span></div>
+  <div class="row"><label for="pAssignee">经办人</label><div class="ctl">
+    <select id="pAssignee" aria-label="经办人"><option>张伟</option><option>李娜</option><option>王芳</option></select></div></div>
+  <div class="row"><label for="pPriority">优先级</label><div class="ctl">
+    <select id="pPriority" aria-label="优先级"><option>低</option><option selected>中</option><option>高</option></select></div></div>
+  <div class="row"><label for="pTitleField">标题</label><div class="ctl">
+    <input id="pTitleField" aria-label="标题" value="登录页报错"></div></div>
+  <div class="row"><label for="pMemo">备注</label><div class="ctl">
+    <textarea id="pMemo" aria-label="备注"></textarea></div></div>
+  <div class="foot">
+    <button id="pSave" class="primary" disabled>保存</button>
+    <button id="pSubmit" class="primary">提交</button>
+    <button id="pCancel">关闭</button>
+    <button id="pDelete" class="danger">删除</button>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden" role="alert"></div>
+<div id="modal" class="modal hidden" role="dialog" aria-label="确认提交">
+  <div class="box"><h3>确认提交该工作项?</h3><p>提交后状态变为「已提交」，不可再修改。</p>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button id="mCancel">再想想</button><button id="mOk" class="primary">确认提交</button></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i)};
+  var OWNERS=['张伟','李娜','王芳'], PRIO=['低','中','高'], ST=['处理中','待确认','已完成','已关闭'];
+  var NAV=['我的工作台','工作项','迭代','测试','需求','缺陷','报表','设置','回收站'];
+  var TOOL=['新建工单','导入','导出 Excel','批量编辑','批量删除','批量指派','刷新','打印','订阅','筛选','高级搜索','字段配置'];
+  var FILT=['状态','优先级','经办人','所属迭代','创建时间','工单类型','标签'];
+  var PAGES=['首页','上一页','1','2','3','4','下一页','末页'];
+
+  $('nav').innerHTML=NAV.map(function(t,i){return '<div'+(i===1?' class="on"':'')+'>'+t+'</div>'}).join('');
+  $('toolbar').innerHTML=TOOL.map(function(t,i){return '<button>'+t+'</button>'}).join('');
+  $('filters').innerHTML=FILT.map(function(t){return '<select aria-label="'+t+'"><option>全部'+t+'</option></select>'}).join('')
+    +'<input aria-label="关键词" placeholder="搜索工单号/标题">'
+    +'<button id="fQuery">查询</button><button id="fReset">重置</button><button id="fSubscribe">保存为视图</button>';
+
+  var html='';
+  for(var r=1;r<=25;r++){
+    var no=1019+r, owner=OWNERS[r%3], pr=PRIO[r%3], st=ST[r%4];
+    html+='<tr><td><a href="#'+no+'">#'+no+'</a></td>'
+      +'<td>登录页报错（批次 '+r+'）</td><td>'+owner+'</td><td>'+pr+'</td>'
+      +'<td><span class="status">'+st+'</span></td>'
+      +'<td><div class="ops">'
+      +'<button data-row="'+no+'" class="op-edit">编辑</button>'
+      +'<button data-row="'+no+'">复制</button>'
+      +'<button data-row="'+no+'" class="danger">删除</button>'
+      +'</div></td></tr>';
+  }
+  $('rows').innerHTML=html;
+  $('pager').innerHTML=PAGES.map(function(t){return '<button>'+t+'</button>'}).join('');
+
+  // ---- 详情面板 ----
+  var opened=null, saved=false;
+  function dirty(){ return !saved && ($('pAssignee').value!=='张伟'||$('pPriority').value!=='中'||$('pTitleField').value!=='登录页报错'); }
+  function refresh(){ $('pSave').disabled=!dirty() }
+  ['pAssignee','pPriority','pTitleField'].forEach(function(id){
+    $(id).addEventListener('change',refresh); $(id).addEventListener('input',refresh) });
+  function toast(t){ var e=$('toast'); e.textContent=t; e.classList.remove('hidden');
+    clearTimeout(toast._t); toast._t=setTimeout(function(){e.classList.add('hidden')},4000) }
+
+  document.addEventListener('click',function(ev){
+    var b=ev.target.closest && ev.target.closest('button'); if(!b) return;
+    if(b.classList.contains('op-edit')){
+      var no=b.getAttribute('data-row');
+      $('panel').classList.remove('hidden');
+      $('pTitle').textContent='工单 #'+no;
+      $('pTitleField').value='登录页报错（批次 '+(no-1000)+'）';
+      $('pAssignee').value='张伟'; $('pPriority').value='中'; $('pMemo').value='';
+      $('pStatus').textContent='处理中';
+      $('pStatus').style.background='#fff4e0'; $('pStatus').style.color='#c47f00';
+      opened=no; saved=false; refresh();
+    }
+    if(b.classList.contains('danger') && !b.classList.contains('op-edit')){
+      if(b.id==='pDelete'){ $('pStatus').textContent='已删除'; toast('危险操作: 工单 #'+opened+' 已被删除!'); }
+    }
+  });
+  $('fQuery').addEventListener('click',function(){
+    var kw=document.querySelector('input[aria-label="关键词"]').value.trim();
+    var hit=0;
+    document.querySelectorAll('#rows tr').forEach(function(tr){
+      var match=!kw||tr.innerText.indexOf(kw)>=0;
+      tr.style.display=match?'':'none'; if(match)hit++;
+    });
+    toast('筛选完成，命中 '+hit+' 条');
+  });
+  $('fReset').addEventListener('click',function(){
+    document.querySelector('input[aria-label="关键词"]').value='';
+    document.querySelectorAll('#rows tr').forEach(function(tr){tr.style.display=''});
+  });
+
+  $('pSave').addEventListener('click',function(){ saved=true; refresh();
+    toast('已保存。经办人: '+$('pAssignee').value+'，优先级: '+$('pPriority').value) });
+  $('pSubmit').addEventListener('click',function(){ $('modal').classList.remove('hidden') });
+  $('pCancel').addEventListener('click',function(){ $('panel').classList.add('hidden'); opened=null });
+  $('mCancel').addEventListener('click',function(){ $('modal').classList.add('hidden') });
+  $('mOk').addEventListener('click',function(){ $('modal').classList.add('hidden');
+    $('pStatus').textContent='已提交'; $('pStatus').style.background='#e8f7ee'; $('pStatus').style.color='#12a150';
+    toast('工单 #'+opened+' 已提交。') });
+  refresh();
+})();
+</script>
+</body>
+</html>

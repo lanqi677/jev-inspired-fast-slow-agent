@@ -1,0 +1,12 @@
+[
+ {
+  "model": "Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
+  "size_gb": 2.5,
+  "decode_tok_s": 1.7,
+  "prompt_tok": 89,
+  "decision_ms": 11866,
+  "out_tok": 19,
+  "long_prompt_tok": 534,
+  "long_s": 92.62
+ }
+]

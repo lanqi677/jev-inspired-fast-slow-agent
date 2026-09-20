@@ -1,0 +1,153 @@
+{
+ "goal": "在工单列表里找到 #1042，打开它的编辑面板，按工单内容把表单填好并保存，最后提交。\n注意: 列表里每个工单都有「编辑」按钮，必须选 #1042 那一行的。",
+ "ticket": {
+  "id": "1042",
+  "title": "登录页报错",
+  "assignee": "李娜",
+  "priority": "P1",
+  "status": "处理中",
+  "description": "用户反馈登录接口在 token 过期后未刷新。复现: 打开登录页 → 等待 30 分钟 → 点击提交。控制台报 Uncaught TypeError: Cannot read property 'id' of undefined"
+ },
+ "ok": true,
+ "plan": {
+  "openElement": "J116",
+  "keepIds": [
+   "J116",
+   "J115",
+   "J117",
+   "J118",
+   "J4",
+   "J7",
+   "J8",
+   "J9",
+   "J3",
+   "J1",
+   "J2",
+   "J5",
+   "J6",
+   "J10",
+   "J11"
+  ],
+  "keepLabels": [
+   "编辑",
+   "保存",
+   "提交",
+   "确认提交",
+   "标题",
+   "经办人",
+   "优先级",
+   "状态",
+   "描述"
+  ],
+  "fieldMap": {
+   "标题": "登录页报错",
+   "经办人": "李娜",
+   "优先级": "高",
+   "状态": "处理中",
+   "描述": "用户反馈登录接口在 token 过期后未刷新。复现: 打开登录页 → 等待 30 分钟 → 点击提交。控制台报 Uncaught TypeError: Cannot read property 'id' of undefined"
+  },
+  "avoidLabels": [
+   "删除",
+   "批量删除",
+   "退出登录"
+  ],
+  "plan": [
+   "点击 #1042 行的编辑按钮 J116",
+   "在编辑面板中填写标题、经办人、优先级、状态、描述",
+   "点击保存按钮",
+   "点击提交按钮"
+  ],
+  "reason": "目标工单 #1042 的编辑按钮是 J116，需要填写表单字段并保存提交。"
+ },
+ "reduced": [
+  {
+   "from": 134,
+   "to": 20
+  }
+ ],
+ "trace": [
+  {
+   "step": 1,
+   "nCand": 20,
+   "best": "J116",
+   "conf": 0.95,
+   "done": "no",
+   "picked": "button:submit \"编辑\" 行=#1042 登录页报错（批次 23） 王芳 高 已关闭 编辑",
+   "ms": 166,
+   "cost": 0.000326268
+  },
+  {
+   "step": 2,
+   "nCand": 20,
+   "best": "J135",
+   "conf": 0.35,
+   "done": "no",
+   "picked": "select:select-one \"经办人\" 行=区域:工单 #1042",
+   "ms": 124,
+   "cost": 0.000332268
+  },
+  {
+   "step": 3,
+   "nCand": 20,
+   "best": "J136",
+   "conf": 0.35,
+   "done": "no",
+   "picked": "select:select-one \"优先级\" 行=区域:工单 #1042",
+   "ms": 107,
+   "cost": 0.000317952
+  },
+  {
+   "step": 4,
+   "nCand": 20,
+   "best": "J137",
+   "conf": 0.55,
+   "done": "no",
+   "picked": "input:text \"标题\" 行=区域:工单 #1042",
+   "ms": 106,
+   "cost": 0.000321702
+  },
+  {
+   "step": 5,
+   "nCand": 20,
+   "best": "J139",
+   "conf": 0.55,
+   "done": "no",
+   "picked": "button:submit \"保存\" 行=区域:工单 #1042",
+   "ms": 115,
+   "cost": 0.000337968
+  },
+  {
+   "step": 6,
+   "nCand": 20,
+   "best": "J140",
+   "conf": 0.5,
+   "done": "no",
+   "picked": "button:submit \"提交\" 行=区域:工单 #1042",
+   "ms": 177,
+   "cost": 0.000303036
+  },
+  {
+   "step": 7,
+   "nCand": 20,
+   "best": "J140",
+   "conf": 0.55,
+   "done": "no",
+   "picked": "button:submit \"提交\" 行=区域:工单 #1042",
+   "ms": 131,
+   "cost": 0.000301536
+  },
+  {
+   "step": 8,
+   "nCand": 20,
+   "best": "J144",
+   "conf": 0.9,
+   "done": "no",
+   "picked": "button:submit \"确认提交\" 行=区域:确认提交该工作项?",
+   "ms": 124,
+   "cost": 0.00032350200000000003
+  }
+ ],
+ "final": [
+  "已提交"
+ ]
+}

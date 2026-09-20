@@ -1,0 +1,62 @@
+{
+  "id": "siteb",
+  "name": "SiteB 统一身份管理与访问控制平台",
+  "kind": "dom",
+  "host": "siteb.internal.example",
+  "verified": "2026-09-20",
+
+  "auth": { "kind": "password", "note": "独立认证，和 SiteA 的集团 SSO 是两套，cookie 互不相干" },
+
+  "page": { "url": "https://siteb.internal.example/ec/?locale=zh-CN#/user/org_user_management" },
+
+  "perceive": {
+    "rowSelector": "tr.ant-table-row,[class*=table-row]",
+    "note": "本页是真表格（有 th）；但搜索前是『暂无数据』，所以行数同样不能当结果数判据"
+  },
+
+  "count": {
+    "kind": "text",
+    "pattern": "用户量\\s*(\\d+)\\s*个",
+    "note": "无 selector → 读 body 文字。搜索前页面根本没有这段文字，所以读到 null 表示『还没搜』而不是 0"
+  },
+
+  "search": {
+    "typeDropdown": {
+      "container": "span.ant-input-group-compact",
+      "current": "容器内那个文本为 姓名|用户名 的可点元素",
+      "options": ["姓名", "用户名"],
+      "status": "fragile",
+      "note": "当前定位方式在【已经是「用户名」】时会失败。正确做法：先读当前值，等于目标就不点"
+    },
+    "input": "input[placeholder=\"请输入\"]",
+    "submit": "button 文本匹配 /查\\s*询/"
+  },
+
+  "detailEntry": {
+    "kind": "clickCell",
+    "selector": "span.LinkColor （父级 div.biam-link-btn），文本等于工号",
+    "note": "【不是】操作列的『编辑』——点编辑什么都不发生（那是 hover 菜单）",
+    "landing": "#/user/personalInfo?uId=...&tId=..."
+  },
+
+  "fields": {
+    "邮箱": "邮箱\\s+([^\\s@]+@[^\\s]+)",
+    "更新日期": "更新日期\\s+(\\d{4}-\\d{2}-\\d{2}[^\\s]*\\s*[\\d:]*)",
+    "创建日期": "创建日期\\s+(\\d{4}-\\d{2}-\\d{2}[^\\s]*\\s*[\\d:]*)"
+  },
+
+  "fieldAliases": {
+    "信息更新时间": "更新日期",
+    "note": "任务描述里写『信息更新时间』，页面上叫『更新日期』——别名必须可配，否则抽取必然落空"
+  },
+
+  "textScope": {
+    "all": true,
+    "max": 4000,
+    "note": "详情页字段分散，读整页。之所以安全，是因为【所有要取的字段都有白名单正则】，模型路径不会被触发"
+  },
+
+  "guards": { "block": ["删除", "重置密码", "用户调动", "授权管理", "退出登录"] },
+
+  "warning": "详情页含身份证号/手机号等敏感字段。只按 fields 里的白名单正则取值，绝不整页 dump 给模型"
+}

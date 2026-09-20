@@ -1,0 +1,18 @@
+{
+  "_note": "OPS_MOCK=1 时，按这张表把真实内网地址换成等价的本地 mock 页。『哪个域名对哪个 mock 文件』是数据，不是代码——所以引擎里没有 SiteA/SiteB 这类字眼。加一个新站点只需要在这里加一行。",
+  "_keys": "键名 = 该站点变体的环境变量名（如 OPS_V=empty_id），default = 不设时的变体",
+
+  "OPS_V": {
+    "match": "sitea",
+    "file": "../ops_scenario/mock_sitea.html",
+    "default": "notfound",
+    "_variants": "empty_id（工号为空）| dup_email（邮箱重名）| notfound（两边都找不到）"
+  },
+
+  "OPS_DV": {
+    "match": "siteb",
+    "file": "../ops_scenario/mock_siteb.html",
+    "default": "ok",
+    "_variants": "stale（邮箱未更新）| ok（正常）| old（邮箱对但更新日期不是今天）"
+  }
+}

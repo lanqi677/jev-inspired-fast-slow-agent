@@ -1,0 +1,39 @@
+{
+  "id": "snake",
+  "name": "网页贪吃蛇（10×10，食物随机）",
+  "kind": "custom",
+  "verified": "2026-09-20",
+
+  "about": "同一个引擎（engine.mjs）在 dom 型适配器之外，用 custom 型适配器跑一个完全不同的环境。这个文件里没有一行属于引擎，引擎里也没有一行属于贪吃蛇。",
+
+  "startUrl": "games/snake.html",
+
+  "probe": "(()=>{const S=window.SNAKE; if(!S) return JSON.stringify({state:'游戏未加载（window.SNAKE 不存在）',options:[],over:true,reason:'未加载'}); return JSON.stringify({state:S.stateText(),options:S.options(),over:S.over,score:S.score,reason:S.reason,seed:S.seed,steps:S.steps,last:window.__LAST__||null})})()",
+
+  "execute": {
+    "press": "window.__LAST__ = window.SNAKE.move(__ACT__.key); return 'OK';"
+  },
+
+  "wait": {
+    "settleMs": 0,
+    "note": "整局由指令驱动，没有动画时序，不需要等。换成真实游戏/驾驶时才需要在这里声明时序。"
+  },
+
+  "guards": {
+    "off": true,
+    "note": "网页后台要拦『删除』这类危险操作；游戏里没有危险动作，关掉拦截。"
+  },
+
+  "maxSteps": 400,
+
+  "success": {
+    "kind": "score",
+    "target": 5,
+    "note": "吃到 5 个食物算达成。改这个数就是改难度，引擎代码不用动。"
+  },
+
+  "history": {
+    "recent": 12,
+    "note": "只带最近 12 步，更早的压成一行统计。这是四个可修面里『历史策略』那一面。"
+  }
+}
