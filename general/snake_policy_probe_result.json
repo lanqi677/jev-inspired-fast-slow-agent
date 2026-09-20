@@ -1,0 +1,207 @@
+{
+ "ranAt": "2026-09-20T10:51:12.569Z",
+ "seeds": [
+  "35749",
+  "83540",
+  "28672",
+  "11111",
+  "22222",
+  "33333",
+  "44444",
+  "55555"
+ ],
+ "results": [
+  {
+   "policy": "A",
+   "seed": 35749,
+   "reason": "无路可走（被自己围死）",
+   "score": 12,
+   "steps": 99,
+   "trapped": true
+  },
+  {
+   "policy": "A",
+   "seed": 83540,
+   "reason": "无路可走（被自己围死）",
+   "score": 25,
+   "steps": 186,
+   "trapped": true
+  },
+  {
+   "policy": "A",
+   "seed": 28672,
+   "reason": "无路可走（被自己围死）",
+   "score": 21,
+   "steps": 158,
+   "trapped": true
+  },
+  {
+   "policy": "A",
+   "seed": 11111,
+   "reason": "无路可走（被自己围死）",
+   "score": 15,
+   "steps": 115,
+   "trapped": true
+  },
+  {
+   "policy": "A",
+   "seed": 22222,
+   "reason": "无路可走（被自己围死）",
+   "score": 19,
+   "steps": 172,
+   "trapped": true
+  },
+  {
+   "policy": "A",
+   "seed": 33333,
+   "reason": "无路可走（被自己围死）",
+   "score": 29,
+   "steps": 258,
+   "trapped": true
+  },
+  {
+   "policy": "A",
+   "seed": 44444,
+   "reason": "无路可走（被自己围死）",
+   "score": 18,
+   "steps": 169,
+   "trapped": true
+  },
+  {
+   "policy": "A",
+   "seed": 55555,
+   "reason": "无路可走（被自己围死）",
+   "score": 34,
+   "steps": 352,
+   "trapped": true
+  },
+  {
+   "policy": "B",
+   "seed": 35749,
+   "reason": "无路可走（被自己围死）",
+   "score": 12,
+   "steps": 99,
+   "trapped": true
+  },
+  {
+   "policy": "B",
+   "seed": 83540,
+   "reason": "无路可走（被自己围死）",
+   "score": 25,
+   "steps": 173,
+   "trapped": true
+  },
+  {
+   "policy": "B",
+   "seed": 28672,
+   "reason": "无路可走（被自己围死）",
+   "score": 32,
+   "steps": 261,
+   "trapped": true
+  },
+  {
+   "policy": "B",
+   "seed": 11111,
+   "reason": "无路可走（被自己围死）",
+   "score": 15,
+   "steps": 120,
+   "trapped": true
+  },
+  {
+   "policy": "B",
+   "seed": 22222,
+   "reason": "无路可走（被自己围死）",
+   "score": 33,
+   "steps": 302,
+   "trapped": true
+  },
+  {
+   "policy": "B",
+   "seed": 33333,
+   "reason": "无路可走（被自己围死）",
+   "score": 16,
+   "steps": 105,
+   "trapped": true
+  },
+  {
+   "policy": "B",
+   "seed": 44444,
+   "reason": "无路可走（被自己围死）",
+   "score": 18,
+   "steps": 195,
+   "trapped": true
+  },
+  {
+   "policy": "B",
+   "seed": 55555,
+   "reason": "无路可走（被自己围死）",
+   "score": 23,
+   "steps": 210,
+   "trapped": true
+  },
+  {
+   "policy": "C",
+   "seed": 35749,
+   "reason": "无路可走（被自己围死）",
+   "score": 12,
+   "steps": 99,
+   "trapped": true
+  },
+  {
+   "policy": "C",
+   "seed": 83540,
+   "reason": "无路可走（被自己围死）",
+   "score": 25,
+   "steps": 173,
+   "trapped": true
+  },
+  {
+   "policy": "C",
+   "seed": 28672,
+   "reason": "无路可走（被自己围死）",
+   "score": 32,
+   "steps": 261,
+   "trapped": true
+  },
+  {
+   "policy": "C",
+   "seed": 11111,
+   "reason": "无路可走（被自己围死）",
+   "score": 15,
+   "steps": 120,
+   "trapped": true
+  },
+  {
+   "policy": "C",
+   "seed": 22222,
+   "reason": "无路可走（被自己围死）",
+   "score": 33,
+   "steps": 302,
+   "trapped": true
+  },
+  {
+   "policy": "C",
+   "seed": 33333,
+   "reason": "无路可走（被自己围死）",
+   "score": 16,
+   "steps": 105,
+   "trapped": true
+  },
+  {
+   "policy": "C",
+   "seed": 44444,
+   "reason": "无路可走（被自己围死）",
+   "score": 18,
+   "steps": 195,
+   "trapped": true
+  },
+  {
+   "policy": "C",
+   "seed": 55555,
+   "reason": "无路可走（被自己围死）",
+   "score": 23,
+   "steps": 210,
+   "trapped": true
+  }
+ ]
+}
